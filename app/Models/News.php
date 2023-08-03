@@ -3,37 +3,31 @@
 namespace App\Models;
 
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Model;
 
-class News
+
+class News extends Model
 {
-  private static $berita = [
-    [
-    "title"=>"First News",
-    "slug"=>"first-news-title",
-    "author"=>"ilham kurniawan",
-    "desc"=>"Lorem, ipsum dolor sit amet consectetur adipisicing elit. Molestias molestiae maxime est quibusdam iure provident dicta adipisci distinctio dolores optio."
-    ],
-    [
-    "title"=>"Second News",
-    "slug"=>"second-news-title",
-    "author"=>"Kang",
-    "desc"=>"Lorem, ipsum dolor sit amet consectetur adipisicing elit. Molestias molestiae maxime est quibusdam iure provident dicta adipisci distinctio dolores optio."
-    ],
-    [
-    "title"=>"Second News",
-    "slug"=>"third-news-title",
-    "author"=>"mr negative",
-    "desc"=>"Lorem, ipsum dolor sit amet consectetur adipisicing elit. Molestias molestiae maxime est quibusdam iure provident dicta adipisci distinctio dolores optio."
-    ]
-
-    ];
-
-    public static function all(){
-        return collect(self::$berita) ;
-    }
-    public static function find($slug)
+    use HasFactory, Sluggable;
+    // protected $fillable =['title', 'author', 'excerpt', 'body'];
+    protected $guarded = ['id'];
+    protected $with = ['category', 'author'];
+    public function category()
     {
-        $news_details= static::all();
-        return $news_details->firstWhere('slug',$slug);
+        return $this->belongsTo(Category::class);
+    }
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+    public function sluggable(): array
+    {
+        return [
+            'slug' => [
+                'source' => 'title'
+            ]
+        ];
     }
 }
